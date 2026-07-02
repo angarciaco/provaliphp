@@ -21,8 +21,8 @@ jobs:
           php-version: '8.2'
           tools: phpcs
 
-      - name: Instalar dependencias (Opcional)
-        run: composer install --prefer-dist --no-progress
+      # - name: Instalar dependencias (Opcional)
+        # run: composer install --prefer-dist --no-progress
         # Útil si tienes reglas de phpcs personalizadas definidas en tu composer.json
 
       - name: Validar con PHPCS
