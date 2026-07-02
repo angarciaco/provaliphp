@@ -1,6 +1,5 @@
-name: Validar PR (PHPCS)
+name: Validar PR (Sintaxis, Estilo y Análisis Estático)
 
-# 1. El trigger ahora es pull_request, apuntando a main
 on:
   pull_request:
     branches:
@@ -8,7 +7,7 @@ on:
 
 jobs:
   validate_php:
-    name: Revisión de Estándares PSR-12
+    name: Revisión Completa de Código PHP
     runs-on: ubuntu-latest
 
     steps:
@@ -19,12 +18,16 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          tools: phpcs
+          tools: phpcs, phpstan
 
-      # - name: Instalar dependencias (Opcional)
-        # run: composer install --prefer-dist --no-progress
-        # Útil si tienes reglas de phpcs personalizadas definidas en tu composer.json
+      - name: 1. Verificación de Errores de Sintaxis (PHP Lint)
+        # Atrapa errores fatales de escritura inmediatamente (ej. echo gotodate sin ;)
+        run: find . -type f -name '*.php' -print0 | xargs -0 -n 1 -P 4 php -l
 
-      - name: Validar con PHPCS
-        # Si esto falla, GitHub marcará el PR con una cruz roja ❌
+      - name: 2. Validar estándares PSR-12 con PHPCS
+        # Verifica el formato visual y espaciado
         run: phpcs --standard=PSR12 --extensions=php .
+
+      - name: 3. Análisis Estático con PHPStan
+        # Inspecciona la lógica (ej. clases como DDateTime que no existen en el core)
+        run: phpstan analyse . --level=5
