@@ -1,0 +1,30 @@
+name: Validar PR (PHPCS)
+
+# 1. El trigger ahora es pull_request, apuntando a main
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate_php:
+    name: Revisión de Estándares PSR-12
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: phpcs
+
+      - name: Instalar dependencias (Opcional)
+        run: composer install --prefer-dist --no-progress
+        # Útil si tienes reglas de phpcs personalizadas definidas en tu composer.json
+
+      - name: Validar con PHPCS
+        # Si esto falla, GitHub marcará el PR con una cruz roja ❌
+        run: phpcs --standard=PSR12 --extensions=php .
